@@ -3,6 +3,8 @@ package com.example.swiftincome
 import android.content.Intent
 import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
+import android.text.TextUtils
+import android.util.Log
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
@@ -10,10 +12,7 @@ import com.google.firebase.auth.FirebaseAuth
 
 class LoginActivity : AppCompatActivity() {
 
-    override fun onCreate(savedInstanceState: Bundle?) {
-        super.onCreate(savedInstanceState)
-        setContentView(R.layout.activity_login)
-    }
+    private val TAG = "LoginActivity"
 
     private var email: String? = null
     private var password: String? = null
@@ -22,11 +21,18 @@ class LoginActivity : AppCompatActivity() {
     private var btnLogin: Button? = null
     private var btnCreateAccount: Button? = null
 
+    override fun onCreate(savedInstanceState: Bundle?) {
+        super.onCreate(savedInstanceState)
+        setContentView(R.layout.activity_login)
+
+        initialize()
+    }
+
     private fun initialize() {
-        etEmail = findViewById(R.id.et_email) as EditText
-        etPassword = findViewById(R.id.et_password) as EditText
-        btnLogin = findViewById(R.id.btn_login) as Button
-        btnCreateAccount = findViewById(R.id.btn_createAccount) as Button
+        etEmail = findViewById<EditText>(R.id.et_email)
+        etPassword = findViewById<EditText>(R.id.et_password)
+        btnLogin = findViewById<Button>(R.id.btn_login)
+        btnCreateAccount = findViewById<Button>(R.id.btn_createAccount)
 
 //        btnCreateAccount!!
 //            .setOnClickListener {
@@ -44,18 +50,31 @@ class LoginActivity : AppCompatActivity() {
 
     private fun loginUser() {
         email = etEmail?.text.toString()
-        password = etEmail?.text.toString()
+        password = etPassword?.text.toString()
 
-        FirebaseAuth.getInstance().signInWithEmailAndPassword(email!!, password!!)
-            .addOnCompleteListener(this) { task ->
-                if (task.isSuccessful) {
-                    redirect()
-                } else {
-                    Toast.makeText(this@LoginActivity, "Authentication failed.",
-                    Toast.LENGTH_SHORT)
-                        .show()
+        if (!TextUtils.isEmpty(email) && !TextUtils.isEmpty(password)) {
+
+            Log.d(TAG, "Logging in user.")
+
+            FirebaseAuth.getInstance().signInWithEmailAndPassword(email!!, password!!)
+                .addOnCompleteListener(this) { task ->
+                    //progressBar!!.()
+                    if (task.isSuccessful) {
+                        // Sign in success, update UI with signed-in user's information
+                        Log.d(TAG, "signInWithEmail:success")
+                        redirect()
+                    } else {
+                        // If sign in fails, display a message to the user.
+                        Log.e(TAG, "signInWithEmail:failure", task.exception)
+                        Toast.makeText(
+                            this@LoginActivity, "Authentication failed.",
+                            Toast.LENGTH_SHORT
+                        ).show()
+                    }
                 }
-            }
+        } else {
+            Toast.makeText(this, "Enter all details", Toast.LENGTH_SHORT).show()
+        }
     }
 
     private fun redirect() {
