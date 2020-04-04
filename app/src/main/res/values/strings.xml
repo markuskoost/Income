@@ -1,3 +1,5 @@
 <resources>
     <string name="app_name">Swift Income</string>
+    <string name="e_mail" />
+    <string name="password" />
 </resources>
