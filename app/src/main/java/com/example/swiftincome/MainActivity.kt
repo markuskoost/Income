@@ -4,16 +4,23 @@ import androidx.appcompat.app.AppCompatActivity
 import android.os.Bundle
 import android.util.Log
 import android.widget.Button
+import android.widget.TextView
 import com.google.android.gms.ads.AdListener
 import com.google.android.gms.ads.AdRequest
 import com.google.android.gms.ads.InterstitialAd
 import com.google.android.gms.ads.MobileAds
+import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.type.Money
+import kotlinx.android.synthetic.main.activity_main.*
 
 class MainActivity : AppCompatActivity() {
 
     private lateinit var mInterstitialAd: InterstitialAd
 
     private var btnShowAd: Button? = null
+    private val TAG = "MainActivity"
+    val mUser = FirebaseAuth.getInstance().currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -49,11 +56,12 @@ class MainActivity : AppCompatActivity() {
             }
         }
         initialise()
+        money()
     }
 
     private fun initialise() {
         btnShowAd = findViewById<Button>(R.id.btn_ad)
-
+        val tv_money = findViewById(R.id.tv_money) as TextView
         btnShowAd!!.setOnClickListener {
             if(mInterstitialAd.isLoaded) {
                 mInterstitialAd.show()
@@ -62,5 +70,24 @@ class MainActivity : AppCompatActivity() {
             }
         }
     }
+    private fun money() {
+        val string = "Money:"
+        var db = FirebaseFirestore.getInstance()
+        val docRef = db.collection("Money").document(mUser!!.uid)
 
+        docRef.get()
+            .addOnSuccessListener { document ->
+                if (document != null) {
+                    Log.d(TAG, "DocumentSnapshot data: ${document.data}")
+                    tv_money!!.text = document.getString(string + "Money")
+                } else {
+                    Log.d(TAG, "No such document")
+                }
+            }
+            .addOnFailureListener { exception ->
+                Log.d(TAG, "get failed with ", exception)
+            }
+
+
+}
 }

@@ -9,7 +9,15 @@ import android.view.View
 import android.widget.Button
 import android.widget.EditText
 import android.widget.Toast
+import androidx.annotation.NonNull
+import com.google.android.gms.tasks.OnFailureListener
+import com.google.android.gms.tasks.OnSuccessListener
 import com.google.firebase.auth.FirebaseAuth
+import com.google.firebase.firestore.DocumentReference
+import com.google.firebase.firestore.FirebaseFirestore
+import com.google.firebase.firestore.auth.User
+import com.google.type.Money
+import kotlinx.android.synthetic.main.activity_main.*
 
 class RegisterActivity : AppCompatActivity() {
     private val TAG = "CreateAccountActivity"
@@ -22,6 +30,7 @@ class RegisterActivity : AppCompatActivity() {
     private var etPassword: EditText? = null
     private var etPassword2: EditText? = null
     private var btnCreateAccount: Button? = null
+    val mUser = FirebaseAuth.getInstance().currentUser
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -59,6 +68,19 @@ class RegisterActivity : AppCompatActivity() {
                             //Verify Email
                             verifyEmail()
                             updateUserInfoAndUI()
+
+                            var db = FirebaseFirestore.getInstance()
+                            val money = hashMapOf(
+                                "Money" to 0.00000
+                            )
+                            db.collection("Money").document(mUser!!.uid)
+                                .set(money)
+                                .addOnSuccessListener { Log.d(TAG, "DocumentSnapshot successfully written!") }
+                                .addOnFailureListener { e -> Log.w(TAG, "Error writing document", e) }
+
+
+
+
                         } else {
                             // If sign in fails, display a message to the user.
                             Log.w(TAG, "createUserWithEmail:failure", task.exception)
@@ -84,7 +106,6 @@ class RegisterActivity : AppCompatActivity() {
     }
 
     private fun verifyEmail() {
-        val mUser = FirebaseAuth.getInstance().currentUser
         mUser!!.sendEmailVerification()
             .addOnCompleteListener(this) { task ->
                 if (task.isSuccessful) {

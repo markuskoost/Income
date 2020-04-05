@@ -34,15 +34,15 @@ class LoginActivity : AppCompatActivity() {
         btnLogin = findViewById<Button>(R.id.btn_login)
         btnCreateAccount = findViewById<Button>(R.id.btn_createAccount)
 
-//        btnCreateAccount!!
-//            .setOnClickListener {
-//                startActivity(
-//                    Intent(
-//                        this@LoginActivity,
-//                        RegisterActivity::class.java
-//                    )
-//                )
-//            }
+        btnCreateAccount!!
+            .setOnClickListener {
+               startActivity(
+                    Intent(
+                       this@LoginActivity,
+                        RegisterActivity::class.java
+                    )
+                )
+            }
 
         btnLogin!!
             .setOnClickListener { loginUser() }
